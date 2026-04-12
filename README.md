@@ -18,7 +18,12 @@ para gerenciar:
 ✔ Pagamentos  
 
 O foco principal é entender como funciona um sistema backend
-bem estruturado utilizando boas práticas.
+bem estruturado utilizando boas práticas como:
+
+✔ Separação de responsabilidades  
+✔ Organização em camadas  
+✔ Reutilização de código  
+✔ Facilidade de manutenção e escalabilidade  
 
 ====================================================================
 
@@ -28,18 +33,33 @@ O projeto segue o padrão em camadas:
 
         Controller → Service → Repository → Model
 
-Cada camada tem uma responsabilidade específica 👇
+📌 EXPLICAÇÃO GERAL:
+
+Cada camada possui uma função específica dentro da aplicação,
+evitando código bagunçado e facilitando manutenção futura.
+
+✔ Controller → recebe requisições HTTP  
+✔ Service → processa regras de negócio  
+✔ Repository → acessa o banco de dados  
+✔ Model → representa os dados do sistema  
 
 ====================================================================
 
 📦 MODEL (ESTRUTURA DOS DADOS)
 
-Aqui ficam as entidades do sistema.
+Aqui ficam as entidades do sistema, ou seja, as classes que
+representam as tabelas do banco de dados.
 
 Exemplo:
 
-✔ Usuario → dados do cliente  
-✔ Pagamento → dados financeiros  
+✔ Usuario → armazena dados do cliente  
+✔ Pagamento → armazena informações financeiras  
+
+📌 Essas classes utilizam anotações como:
+
+✔ @Entity  
+✔ @Id  
+✔ @OneToOne  
 
 ---
 
@@ -47,10 +67,16 @@ Exemplo:
 
         Usuario 1 → 1 Pagamento
 
-Ou seja:
-
 ✔ Um usuário possui um pagamento  
 ✔ Um pagamento pertence a um usuário  
+
+📌 Isso é feito utilizando:
+
+    @OneToOne
+    @JoinColumn
+
+Esse tipo de relacionamento garante integridade dos dados
+no banco.
 
 ====================================================================
 
@@ -66,57 +92,80 @@ Pagamento:
     valor: 100
     tipo: PIX
 
-👉 O usuário está ligado ao pagamento
+👉 O usuário está diretamente ligado ao pagamento,
+permitindo fácil acesso às informações financeiras.
 
 ====================================================================
 
 🧠 REPOSITORY (ACESSO AO BANCO)
 
-Responsável por conversar com o banco de dados.
+Responsável por fazer a comunicação com o banco de dados.
 
-Exemplos:
+Utiliza o **Spring Data JPA**, que permite:
 
-✔ salvar dados  
-✔ buscar usuários  
-✔ filtrar por nome  
-✔ ordenar resultados  
+✔ salvar dados automaticamente  
+✔ buscar registros por ID  
+✔ criar consultas sem SQL  
+✔ paginação e ordenação  
 
-Tudo isso sem escrever SQL 😎
+Exemplo:
+
+    usuarioRepository.save(usuario);
+    usuarioRepository.findAll();
+
+📌 Tudo isso sem precisar escrever SQL manualmente.
 
 ====================================================================
 
 ⚙️ SERVICE (REGRA DE NEGÓCIO)
 
-Aqui fica a lógica do sistema.
+Essa é a camada mais importante do sistema.
 
-Ele:
+Ela é responsável por:
 
-✔ recebe dados do controller  
-✔ processa regras  
-✔ envia para o repository  
+✔ validar dados  
+✔ aplicar regras de negócio  
+✔ evitar dados inconsistentes  
+✔ organizar a lógica do sistema  
 
-Exemplo:
+Exemplo de responsabilidades:
 
-    salvar usuário  
-    listar usuários  
+✔ impedir cadastro duplicado  
+✔ validar campos obrigatórios  
+✔ processar informações antes de salvar  
+
+Fluxo:
+
+Controller → Service → Repository
 
 ====================================================================
 
 🌐 CONTROLLER (ENTRADA DA API)
 
-É a porta de entrada do sistema.
+Responsável por receber requisições do cliente (Postman, frontend, etc).
 
-Aqui você consegue:
+Aqui são definidos os endpoints da API:
 
-✔ cadastrar usuário (POST)  
-✔ listar usuários (GET)  
+✔ POST → cadastrar dados  
+✔ GET → listar dados  
+✔ PUT → atualizar  
+✔ DELETE → remover  
 
----
+Exemplo:
+
+    @PostMapping("/usuarios")
+    public Usuario salvar(@RequestBody Usuario usuario)
+
+📌 O controller NÃO deve conter regras de negócio,
+apenas encaminhar para o service.
+
+====================================================================
 
 📌 EXEMPLO DE REQUISIÇÃO
 
 POST /usuarios
 
+```json
 {
   "nome": "João",
   "servico": "Corte",
@@ -127,29 +176,3 @@ POST /usuarios
     "tipo": "PIX"
   }
 }
-
-====================================================================
-
-🔁 FLUXO DO SISTEMA
-
-Cliente (Postman)
-        ↓
-Controller
-        ↓
-Service
-        ↓
-Repository
-        ↓
-Banco de Dados
-
-====================================================================
-
-🚀 O QUE VOCÊ APRENDE COM ESSE PROJETO
-
-✔ Arquitetura em camadas  
-✔ Spring Boot na prática  
-✔ Relacionamento entre entidades  
-✔ API REST  
-✔ Organização de código  
-
-====================================================================
