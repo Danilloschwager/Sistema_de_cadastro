@@ -161,7 +161,7 @@ apenas encaminhar para o service.
 
 ====================================================================
 
-📌 EXEMPLO DE REQUISIÇÃO
+📌 EXEMPLO DE REQUISIÇOES
 
 POST /usuarios
 
